@@ -1,11 +1,14 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
 
-module.exports = {
-  entry: './src/js/index.js',
-  output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
+export default {
+  // entry: './src/index.js',
+  // output: {
+  //   filename: 'main.js',
+  //   path: path.resolve(__dirname, 'dist'),
+  // },
+  devServer: {
+    port: 3000,
   },
   mode: process.env.NODE_ENV || 'development',
   module: {
@@ -27,7 +30,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'index.html',
+      template: './src/index.html',
     }),
   ],
 };
