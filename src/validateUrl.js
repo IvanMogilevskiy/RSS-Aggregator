@@ -1,11 +1,20 @@
 import * as yup from 'yup';
 
-const validateUrl = (url, appliedUrls) => {
+const validateUrl = (url, addedFeeds, i18n) => {
+  yup.setLocale({
+    string: {
+      url: i18n.t('errors.notUrl'),
+    },
+    mixed: {
+      notOneOf: i18n.t('errors.notUnique'),
+    },
+  });
+
   const schema = yup
     .string()
-    .url('Ссылка должна быть валидным URL')
+    .url()
     .required()
-    .notOneOf(appliedUrls, 'RSS уже существует');
+    .notOneOf(addedFeeds);
 
   return schema.validate(url);
 };

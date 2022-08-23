@@ -1,12 +1,12 @@
 /* eslint-disable no-param-reassign, no-console  */
 import isEmpty from 'lodash/isEmpty.js';
 
-const handleProcessState = (elements, processState) => {
+const handleProcessState = (elements, processState, i18n) => {
   switch (processState) {
     case 'added':
       elements.submitButton.disabled = false;
       elements.input.readOnly = false;
-      elements.feedback.textContent = 'RSS успешно загружен';
+      elements.feedback.textContent = i18n.t('processState.added');
       elements.form.reset();
       elements.form.focus();
       break;
@@ -59,10 +59,10 @@ const renderErrors = (elements, error, prevError) => {
   elements.feedback.textContent = error;
 };
 
-const render = (elements) => (path, value, prevValue) => {
+const render = (elements, i18n) => (path, value, prevValue) => {
   switch (path) {
     case 'form.processState':
-      handleProcessState(elements, value);
+      handleProcessState(elements, value, i18n);
       break;
 
     case 'form.processError':
