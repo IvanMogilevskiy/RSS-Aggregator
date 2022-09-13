@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign, no-console  */
-import isEmpty from 'lodash/isEmpty.js';
 
 const handleProcessState = (elements, processState, i18n) => {
   switch (processState) {
@@ -82,4 +81,86 @@ const render = (elements, i18n) => (path, value, prevValue) => {
   }
 };
 
-export default render;
+const renderFeeds = (watchedState, elements, i18n) => {
+  elements.feedsContainer.textContent = '';
+
+  const cardBorder = document.createElement('div');
+  cardBorder.classList.add('card', 'border-0');
+
+  const cardBody = document.createElement('div');
+  cardBody.classList.add('card-body');
+
+  const cardTitle = document.createElement('h2');
+  cardTitle.classList.add('card-title', 'h4');
+  cardTitle.textContent = i18n.t('feeds.title');
+
+  const feedsList = document.createElement('ul');
+  feedsList.classList.add('list-group', 'border-0', 'rounded-0');
+
+  cardBody.append(cardTitle);
+  cardBorder.append(cardBody);
+  cardBorder.append(feedsList);
+  elements.feedsContainer.append(cardBorder);
+
+  watchedState.addedFeeds.forEach((feed) => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'border-0', 'border-end-0');
+
+    const h3 = document.createElement('h3');
+    h3.classList.add('h6', 'm-0');
+    h3.textContent = feed.name;
+
+    const p = document.createElement('p');
+    p.classList.add('m-0', 'small', 'text-black-50');
+    p.textContent = feed.description;
+
+    li.append(h3);
+    li.append(p);
+    feedsList.append(li);
+  });
+};
+
+const renderPosts = (watchedState, elements, i18n) => {
+  elements.postsContainer.textContent = '';
+
+  const cardBorder = document.createElement('div');
+  cardBorder.classList.add('card', 'border-0');
+
+  const cardBody = document.createElement('div');
+  cardBody.classList.add('card-body');
+
+  const cardTitle = document.createElement('h2');
+  cardTitle.classList.add('card-title', 'h4');
+  cardTitle.textContent = i18n.t('posts.title');
+
+  const postsList = document.createElement('ul');
+  postsList.classList.add('list-group', 'border-0', 'rounded-0');
+
+  cardBody.append(cardTitle);
+  cardBorder.append(cardBody);
+  cardBorder.append(postsList);
+  elements.postsContainer.append(cardBorder);
+
+  watchedState.posts.forEach((post) => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+
+    const postName = document.createElement('a');
+    postName.setAttribute('href', post.link);
+    postName.classList.add('fw-normal', 'link-secondary');
+    postName.setAttribute('target', '_blank');
+    postName.setAttribute('rel', 'noopener noreferrer');
+    postName.textContent = post.name;
+
+    const watchButton = document.createElement('button');
+    watchButton.setAttribute('type', 'button');
+    watchButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    watchButton.textContent = i18n.t('posts.watchButton');
+
+    li.append(postName);
+    li.append(watchButton);
+    postsList.append(li);
+  });
+};
+
+export { render, renderFeeds, renderPosts };
