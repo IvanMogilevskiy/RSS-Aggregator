@@ -1,10 +1,13 @@
 /* eslint-disable no-param-reassign, no-console  */
 
 import i18next from 'i18next';
+import axios from 'axios';
 import onChange from 'on-change';
-import resources from './locales/locales.js';
+import uniqueId from 'lodash/uniqueId.js';
+import parse from './parser.js';
+import ru from './locales/ru.js';
 import validateUrl from './validateUrl.js';
-import render from './view.js';
+import { render, renderFeeds, renderPosts } from './view.js';
 
 export default () => {
   const elements = {
@@ -12,6 +15,8 @@ export default () => {
     input: document.getElementById('url-input'),
     submitButton: document.querySelector('button[type="submit"]'),
     feedback: document.querySelector('.feedback'),
+    feedsContainer: document.querySelector('.feeds'),
+    postsContainer: document.querySelector('.posts'),
   };
 
   const state = {
@@ -23,13 +28,16 @@ export default () => {
       url: '',
     },
     addedFeeds: [],
+    posts: [],
   };
 
   const i18n = i18next.createInstance();
   i18n.init({
     lng: 'ru',
     debug: true,
-    resources,
+    resources: {
+      ru,
+    },
   });
 
   const watchedState = onChange(state, render(elements));
@@ -43,10 +51,24 @@ export default () => {
       .then((url) => {
         watchedState.form.url = url;
         watchedState.form.errors = '';
-        watchedState.addedFeeds.push(url);
         watchedState.form.processState = 'adding';
+
+        return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`);
+      })
+      .then((response) => {
+        const { feed, posts } = parse(response.data.contents);
+        feed.id = uniqueId();
+        posts.forEach((item) => {
+          item.feedId = feed.id;
+        });
+        watchedState.addedFeeds.push(feed);
+        watchedState.posts.push(posts);
+        renderFeeds(watchedState, elements);
+        renderPosts(watchedState, elements);
+        watchedState.form.processState = 'added';
       })
       .catch((err) => {
+        console.log(err);
         watchedState.form.processState = 'error';
         watchedState.form.errors = err.message;
         watchedState.form.valid = false;
