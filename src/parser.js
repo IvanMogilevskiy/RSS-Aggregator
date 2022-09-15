@@ -1,39 +1,27 @@
 export default (xmlString) => {
   const parser = new DOMParser();
   const data = parser.parseFromString(xmlString, 'application/xml');
+  const parsingError = data.querySelector('parsererror');
+  if (parsingError) {
+    throw new Error('parsingError');
+  }
 
-  const output = {
-    feed: {
-      name: '',
-      description: '',
-      link: '',
-    },
-    posts: [],
+  const feed = {
+    name: data.querySelector('channel > title').textContent,
+    description: data.querySelector('channel > description').textContent,
+    link: data.querySelector('channel > link').textContent,
   };
 
-  const channelName = data.querySelector('channel > title');
-  const channelDescription = data.querySelector('channel > description');
-  const channelLink = data.querySelector('channel > link');
+  const items = [...data.querySelectorAll('item')];
+  const posts = items.map((item) => (
+    {
+      name: item.querySelector('title').textContent,
+      description: item.querySelector('description').textContent,
+      link: item.querySelector('link').textContent,
+    }
+  ));
 
-  const posts = data.querySelectorAll('post');
-
-  output.feed.name = channelName.textContent;
-  output.feed.description = channelDescription.textContent;
-  output.feed.link = channelLink.textContent;
-
-  posts.forEach((post) => {
-    const itemName = post.querySelector('title');
-    const itemDescription = post.querySelector('description');
-    const itemLink = post.querySelector('link');
-
-    output.posts.push({
-      name: itemName.textContent,
-      description: itemDescription.textContent,
-      link: itemLink.textContent,
-    });
-  });
-
-  return output;
+  return { feed, posts };
 };
 
 // { feed: { name, description, link }, posts: [{ name, description, link }] }
