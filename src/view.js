@@ -5,6 +5,7 @@ const handleProcessState = (elements, processState, i18n) => {
     case 'added':
       elements.submitButton.disabled = false;
       elements.input.readOnly = false;
+      elements.feedback.classList.replace('text-danger', 'text-success');
       elements.feedback.textContent = i18n.t('processState.added');
       elements.form.reset();
       elements.form.focus();
@@ -28,9 +29,6 @@ const handleProcessState = (elements, processState, i18n) => {
     default:
       throw new Error(`Unknown process state: ${processState}`);
   }
-};
-
-const handleProcessError = () => {
 };
 
 const renderErrors = (elements, error, prevError) => {
@@ -58,31 +56,8 @@ const renderErrors = (elements, error, prevError) => {
   elements.feedback.textContent = error;
 };
 
-const render = (elements, i18n) => (path, value, prevValue) => {
-  switch (path) {
-    case 'form.processState':
-      handleProcessState(elements, value, i18n);
-      break;
-
-    case 'form.processError':
-      handleProcessError();
-      break;
-
-    case 'form.valid':
-      // elements.submitButton.disabled = !value;
-      break;
-
-    case 'form.errors':
-      renderErrors(elements, value, prevValue);
-      break;
-
-    default:
-      break;
-  }
-};
-
 const renderFeeds = (watchedState, elements, i18n) => {
-  elements.feedsContainer.textContent = '';
+  elements.feedsContainer.innerHTML = '';
 
   const cardBorder = document.createElement('div');
   cardBorder.classList.add('card', 'border-0');
@@ -121,29 +96,29 @@ const renderFeeds = (watchedState, elements, i18n) => {
 };
 
 const renderPosts = (watchedState, elements, i18n) => {
-  elements.postsContainer.textContent = '';
+  elements.postsContainer.innerHTML = '';
 
   const cardBorder = document.createElement('div');
   cardBorder.classList.add('card', 'border-0');
+  elements.postsContainer.append(cardBorder);
 
   const cardBody = document.createElement('div');
   cardBody.classList.add('card-body');
+  cardBorder.append(cardBody);
 
   const cardTitle = document.createElement('h2');
   cardTitle.classList.add('card-title', 'h4');
   cardTitle.textContent = i18n.t('posts.title');
+  cardBody.append(cardTitle);
 
   const postsList = document.createElement('ul');
   postsList.classList.add('list-group', 'border-0', 'rounded-0');
-
-  cardBody.append(cardTitle);
-  cardBorder.append(cardBody);
   cardBorder.append(postsList);
-  elements.postsContainer.append(cardBorder);
 
   watchedState.posts.forEach((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+    postsList.append(li);
 
     const postName = document.createElement('a');
     postName.setAttribute('href', post.link);
@@ -151,16 +126,37 @@ const renderPosts = (watchedState, elements, i18n) => {
     postName.setAttribute('target', '_blank');
     postName.setAttribute('rel', 'noopener noreferrer');
     postName.textContent = post.name;
+    li.append(postName);
 
     const watchButton = document.createElement('button');
     watchButton.setAttribute('type', 'button');
     watchButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     watchButton.textContent = i18n.t('posts.watchButton');
-
-    li.append(postName);
     li.append(watchButton);
-    postsList.append(li);
   });
 };
 
-export { render, renderFeeds, renderPosts };
+const render = (state, elements, i18n) => (path, value, prevValue) => {
+  switch (path) {
+    case 'form.processState':
+      handleProcessState(elements, value, i18n);
+      break;
+
+    case 'form.errors':
+      renderErrors(elements, value, prevValue);
+      break;
+
+    case 'posts':
+      renderPosts(state, elements, i18n);
+      break;
+
+    case 'addedFeeds':
+      renderFeeds(state, elements, i18n);
+      break;
+
+    default:
+      break;
+  }
+};
+
+export default render;
