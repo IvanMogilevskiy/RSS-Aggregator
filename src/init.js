@@ -7,7 +7,7 @@ import uniqueId from 'lodash/uniqueId.js';
 import parse from './parser.js';
 import ru from './locales/ru.js';
 import validateUrl from './validateUrl.js';
-import { render, renderFeeds, renderPosts } from './view.js';
+import render from './view.js';
 
 export default () => {
   const elements = {
@@ -21,9 +21,7 @@ export default () => {
 
   const state = {
     form: {
-      valid: true,
       processState: 'filling',
-      processError: null,
       errors: '',
       url: '',
     },
@@ -40,7 +38,7 @@ export default () => {
     },
   });
 
-  const watchedState = onChange(state, render(elements));
+  const watchedState = onChange(state, render(state, elements, i18n));
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -58,20 +56,25 @@ export default () => {
       .then((response) => {
         const { feed, posts } = parse(response.data.contents);
         feed.id = uniqueId();
-        posts.forEach((item) => {
-          item.feedId = feed.id;
+        posts.forEach((post) => {
+          post.feedId = feed.id;
         });
-        watchedState.addedFeeds.push(feed);
-        watchedState.posts.push(posts);
-        renderFeeds(watchedState, elements);
-        renderPosts(watchedState, elements);
+        watchedState.addedFeeds = [...watchedState.addedFeeds, feed];
+        watchedState.posts = [...watchedState.posts, ...posts];
         watchedState.form.processState = 'added';
       })
       .catch((err) => {
         console.log(err);
         watchedState.form.processState = 'error';
-        watchedState.form.errors = err.message;
-        watchedState.form.valid = false;
+        if (err.name === 'ValidationError') {
+          watchedState.form.errors = err.message;
+        }
+        if (err.response) {
+          watchedState.form.errors = i18n.t('errors.networkError');
+        }
+        if (err.message === 'parsingError') {
+          watchedState.form.errors = i18n.t('errors.parsingError');
+        }
       });
   });
 };
