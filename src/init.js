@@ -8,6 +8,7 @@ import parse from './parser.js';
 import ru from './locales/ru.js';
 import validateUrl from './validateUrl.js';
 import render from './view.js';
+import updatePosts from './updatePosts.js';
 
 export default () => {
   const elements = {
@@ -59,8 +60,8 @@ export default () => {
         posts.forEach((post) => {
           post.feedId = feed.id;
         });
-        watchedState.addedFeeds = [...watchedState.addedFeeds, feed];
-        watchedState.posts = [...watchedState.posts, ...posts];
+        watchedState.addedFeeds = [feed, ...watchedState.addedFeeds];
+        watchedState.posts = [...posts, ...watchedState.posts];
         watchedState.form.processState = 'added';
       })
       .catch((err) => {
@@ -77,4 +78,5 @@ export default () => {
         }
       });
   });
+  setTimeout(() => updatePosts(watchedState), 5000);
 };
