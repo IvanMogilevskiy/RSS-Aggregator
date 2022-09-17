@@ -2,6 +2,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
 
 export default {
+  devtool: 'source-map',
   // entry: './src/index.js',
   // output: {
   //   filename: 'main.js',
