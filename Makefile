@@ -12,3 +12,6 @@ test-coverage:
 
 lint:
 	npx eslint .
+
+start:
+	npm run server
