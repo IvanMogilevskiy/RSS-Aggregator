@@ -57,6 +57,7 @@ export default () => {
       .then((response) => {
         const { feed, posts } = parse(response.data.contents);
         feed.id = uniqueId();
+        feed.link = value;
         posts.forEach((post) => {
           post.feedId = feed.id;
         });

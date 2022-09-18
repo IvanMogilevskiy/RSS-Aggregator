@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-import _ from 'lodash';
 import axios from 'axios';
 import parse from './parser.js';
 
@@ -8,22 +7,21 @@ const updatePosts = (watchedState) => {
     setTimeout(() => updatePosts(watchedState), 5000);
     return;
   }
-  const promises = watchedState.addedFeeds.map((addedFeed) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(addedFeed.link)}`));
-  Promise.all(promises)
-    .then((responses) => {
-      responses.forEach((response) => {
-        const { feed, posts } = parse(response.data.contents);
-        const currentFeed = watchedState.addedFeeds
-          .filter(({ name }) => feed.name.textContent === name.textContent);
-        posts.forEach((post) => {
-          post.feedId = currentFeed.id;
+  const promises = watchedState.addedFeeds.map((addedFeed) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(addedFeed.link)}`)
+    .then((response) => {
+      const { posts } = parse(response.data.contents);
+      const usedPostLinks = watchedState.posts.map(({ link }) => link);
+      const newPosts = posts.filter(({ link }) => !usedPostLinks.includes(link));
+      if (newPosts.length !== 0) {
+        newPosts.forEach((post) => {
+          post.feedId = addedFeed.id;
         });
-        const newPosts = _.xor(watchedState.posts, posts);
         watchedState.posts = [...newPosts, ...watchedState.posts];
-      });
+      }
     })
-    .catch(console.error)
-    .then(() => updatePosts(watchedState), 5000);
+    .catch(console.error));
+  Promise.all(promises)
+    .then(() => setTimeout(() => updatePosts(watchedState), 5000));
 };
 
 export default updatePosts;
