@@ -9,7 +9,6 @@ export default (xmlString) => {
   const feed = {
     name: data.querySelector('channel > title').textContent,
     description: data.querySelector('channel > description').textContent,
-    link: data.querySelector('channel > link').textContent,
   };
 
   const items = [...data.querySelectorAll('item')];
