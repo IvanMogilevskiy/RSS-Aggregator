@@ -18,6 +18,11 @@ export default () => {
     feedback: document.querySelector('.feedback'),
     feedsContainer: document.querySelector('.feeds'),
     postsContainer: document.querySelector('.posts'),
+    modal: document.getElementById('modal'),
+    modalTitle: document.querySelector('.modal-title'),
+    modalBody: document.querySelector('.modal-body'),
+    modalReadButton: document.querySelector('a.full-article'),
+    modalCloseButton: document.querySelector('button.btn-secondary'),
   };
 
   const state = {
@@ -28,6 +33,10 @@ export default () => {
     },
     addedFeeds: [],
     posts: [],
+    uiState: {
+      viewedPosts: [],
+      modal: '',
+    },
   };
 
   const i18n = i18next.createInstance();
@@ -79,5 +88,16 @@ export default () => {
         }
       });
   });
+
+  elements.postsContainer.addEventListener('click', (e) => {
+    if (e.target.type === 'a') {
+      watchedState.uiState.viewedPosts.push(e.target.dataset.id);
+    }
+    if (e.target.type === 'button') {
+      watchedState.uiState.modal = e.target.dataset.id;
+      watchedState.uiState.viewedPosts.push(e.target.dataset.id);
+    }
+  });
+
   setTimeout(() => updatePosts(watchedState), 5000);
 };

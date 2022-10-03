@@ -122,7 +122,11 @@ const renderPosts = (watchedState, elements, i18n) => {
 
     const postName = document.createElement('a');
     postName.setAttribute('href', post.link);
-    postName.classList.add('fw-normal', 'link-secondary');
+
+    const linkClass = watchedState.uiState.viewedPosts.includes(post.id) ? ('fw-normal', 'link-secondary') : ('fw-bold');
+
+    postName.classList.add(linkClass);
+    postName.dataset.id = post.id;
     postName.setAttribute('target', '_blank');
     postName.setAttribute('rel', 'noopener noreferrer');
     postName.textContent = post.name;
@@ -131,12 +135,25 @@ const renderPosts = (watchedState, elements, i18n) => {
     const watchButton = document.createElement('button');
     watchButton.setAttribute('type', 'button');
     watchButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    watchButton.dataset.id = post.id;
+    watchButton.dataset.bsToggle = 'modal';
+    watchButton.dataset.bsTarget = '#modal';
     watchButton.textContent = i18n.t('posts.watchButton');
     li.append(watchButton);
   });
 };
 
-const render = (state, elements, i18n) => (path, value, prevValue) => {
+const renderModal = (watchedState, elements, postId, i18n) => {
+  const [chosenPost] = watchedState.posts.filter((post) => post.id === postId);
+
+  elements.modalTitle.textContent = chosenPost.name;
+  elements.modalBody.textContent = chosenPost.description;
+  elements.modalReadButton.setAttribute('href', chosenPost.link);
+  elements.modalReadButton.textContent = i18n.t('modal.readButton');
+  elements.modalCloseButton.textContent = i18n.t('modal.closeButton');
+};
+
+const render = (watchedState, elements, i18n) => (path, value, prevValue) => {
   switch (path) {
     case 'form.processState':
       handleProcessState(elements, value, i18n);
@@ -147,11 +164,19 @@ const render = (state, elements, i18n) => (path, value, prevValue) => {
       break;
 
     case 'posts':
-      renderPosts(state, elements, i18n);
+      renderPosts(watchedState, elements, i18n);
       break;
 
     case 'addedFeeds':
-      renderFeeds(state, elements, i18n);
+      renderFeeds(watchedState, elements, i18n);
+      break;
+
+    case 'uiState.modal':
+      renderModal(watchedState, elements, value, i18n);
+      break;
+
+    case 'uiState.viewedPosts':
+      renderPosts(watchedState, elements, i18n);
       break;
 
     default:
