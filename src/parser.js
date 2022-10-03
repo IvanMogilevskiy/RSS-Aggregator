@@ -22,5 +22,3 @@ export default (xmlString) => {
 
   return { feed, posts };
 };
-
-// { feed: { name, description, link }, posts: [{ name, description, link }] }
