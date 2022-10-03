@@ -69,6 +69,7 @@ export default () => {
         feed.link = value;
         posts.forEach((post) => {
           post.feedId = feed.id;
+          post.id = uniqueId();
         });
         watchedState.addedFeeds = [feed, ...watchedState.addedFeeds];
         watchedState.posts = [...posts, ...watchedState.posts];
@@ -90,12 +91,10 @@ export default () => {
   });
 
   elements.postsContainer.addEventListener('click', (e) => {
-    if (e.target.type === 'a') {
-      watchedState.uiState.viewedPosts.push(e.target.dataset.id);
-    }
+    watchedState.uiState.viewedPosts.push(e.target.dataset.id);
+
     if (e.target.type === 'button') {
       watchedState.uiState.modal = e.target.dataset.id;
-      watchedState.uiState.viewedPosts.push(e.target.dataset.id);
     }
   });
 
