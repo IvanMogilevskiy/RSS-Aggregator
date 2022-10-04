@@ -1,4 +1,4 @@
-develope:
+develop:
 	npx webpack serve
 
 install:
@@ -8,9 +8,6 @@ build:
 	rm -rf dist
 	NODE_ENV=production npx webpack
 
-publish:
-	npm publish --dry-run
-
 test:
 	npm test
 
@@ -19,8 +16,5 @@ test-coverage:
 
 lint:
 	npx eslint .
-
-start:
-	npm run server
 
 .PHONY: test
