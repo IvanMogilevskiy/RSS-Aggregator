@@ -18,19 +18,19 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install
+      - name: npm install, build
         run: |
           make install
+          make build
         env:
           CI: true
-      - name: linter install
-        run: npm install --save-dev eslint
-      - name: linter init
-        run: npx eslint --init
+
       - name: Run linter
-        run: |
-          make test
-          make lint
+        run: make lint
+
+      - name: Run tests
+        run: make test
+
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.7.4
         env:
