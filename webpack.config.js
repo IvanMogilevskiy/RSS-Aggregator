@@ -1,16 +1,7 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import path from 'path';
 
 export default {
   devtool: 'source-map',
-  // entry: './src/index.js',
-  // output: {
-  //   filename: 'main.js',
-  //   path: path.resolve(__dirname, 'dist'),
-  // },
-  devServer: {
-    port: 3000,
-  },
   mode: process.env.NODE_ENV || 'development',
   module: {
     rules: [
