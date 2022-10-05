@@ -29,7 +29,7 @@ export default () => {
     form: {
       processState: 'filling',
       errors: '',
-      url: '',
+      // url: '',
     },
     addedFeeds: [],
     posts: [],
@@ -54,10 +54,10 @@ export default () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const value = formData.get('url');
-
-    validateUrl(value, watchedState.addedFeeds, i18n)
+    const urls = watchedState.addedFeeds.map((feed) => feed.url);
+    validateUrl(value, urls, i18n)
       .then((url) => {
-        watchedState.form.url = url;
+        // watchedState.form.url = url;
         watchedState.form.errors = '';
         watchedState.form.processState = 'adding';
 

@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-const validateUrl = (url, addedFeeds, i18n) => {
+const validateUrl = (url, urls, i18n) => {
   yup.setLocale({
     string: {
       url: i18n.t('errors.notUrl'),
@@ -14,7 +14,7 @@ const validateUrl = (url, addedFeeds, i18n) => {
     .string()
     .url()
     .required()
-    .notOneOf(addedFeeds);
+    .notOneOf(urls);
 
   return schema.validate(url);
 };
