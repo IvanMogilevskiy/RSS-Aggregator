@@ -92,7 +92,6 @@ export default () => {
 
   elements.postsContainer.addEventListener('click', (e) => {
     watchedState.uiState.viewedPosts.push(e.target.dataset.id);
-
     if (e.target.type === 'button') {
       watchedState.uiState.modal = e.target.dataset.id;
     }
