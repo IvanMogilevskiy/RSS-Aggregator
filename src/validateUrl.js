@@ -7,6 +7,7 @@ const validateUrl = (url, urls, i18n) => {
     },
     mixed: {
       notOneOf: i18n.t('errors.notUnique'),
+      required: i18n.t('errors.required'),
     },
   });
 
