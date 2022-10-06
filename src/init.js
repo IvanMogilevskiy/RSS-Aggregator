@@ -54,7 +54,7 @@ export default () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const value = formData.get('url');
-    const urls = watchedState.addedFeeds.map((feed) => feed.url);
+    const urls = watchedState.addedFeeds.map((feed) => feed.link);
     validateUrl(value, urls, i18n)
       .then((url) => {
         // watchedState.form.url = url;
