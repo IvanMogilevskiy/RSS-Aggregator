@@ -19,6 +19,7 @@ const handleProcessState = (elements, processState, i18n) => {
     case 'adding':
       elements.submitButton.disabled = true;
       elements.input.readOnly = true;
+      elements.feedback.textContent = i18n.t('processState.loading');
       break;
 
     case 'filling':
@@ -31,7 +32,7 @@ const handleProcessState = (elements, processState, i18n) => {
   }
 };
 
-const renderErrors = (elements, error, prevError) => {
+const renderErrors = (elements, error, prevError, i18n) => {
   const hadError = (prevError !== '');
   const hasError = (error !== '');
 
@@ -47,13 +48,13 @@ const renderErrors = (elements, error, prevError) => {
   }
 
   if (hadError && hasError) {
-    elements.feedback.textContent = error;
+    elements.feedback.textContent = i18n.t(error);
     return;
   }
 
   elements.input.classList.add('is-invalid');
   elements.feedback.classList.add('text-danger');
-  elements.feedback.textContent = error;
+  elements.feedback.textContent = i18n.t(error);
 };
 
 const renderFeeds = (watchedState, elements, i18n) => {
@@ -123,7 +124,7 @@ const renderPosts = (watchedState, elements, i18n) => {
     const postName = document.createElement('a');
     postName.setAttribute('href', post.link);
 
-    const linkClass = watchedState.uiState.viewedPosts.includes(post.id) ? ('fw-normal', 'link-secondary') : ('fw-bold');
+    const linkClass = watchedState.uiState.viewedPostsId.has(post.id) ? ('fw-normal', 'link-secondary') : ('fw-bold');
 
     postName.classList.add(linkClass);
     postName.dataset.id = post.id;
@@ -160,7 +161,7 @@ const render = (watchedState, elements, i18n) => (path, value, prevValue) => {
       break;
 
     case 'form.errors':
-      renderErrors(elements, value, prevValue);
+      renderErrors(elements, value, prevValue, i18n);
       break;
 
     case 'posts':
@@ -171,11 +172,11 @@ const render = (watchedState, elements, i18n) => (path, value, prevValue) => {
       renderFeeds(watchedState, elements, i18n);
       break;
 
-    case 'uiState.modal':
+    case 'uiState.modalId':
       renderModal(watchedState, elements, value, i18n);
       break;
 
-    case 'uiState.viewedPosts':
+    case 'uiState.viewedPostsId':
       renderPosts(watchedState, elements, i18n);
       break;
 
