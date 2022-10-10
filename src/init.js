@@ -9,6 +9,7 @@ import ru from './locales/ru.js';
 import validateUrl from './validateUrl.js';
 import render from './view.js';
 import updatePosts from './updatePosts.js';
+import makeProxyUrl from './makeProxyUrl.js';
 
 export default () => {
   const elements = {
@@ -29,13 +30,12 @@ export default () => {
     form: {
       processState: 'filling',
       errors: '',
-      // url: '',
     },
     addedFeeds: [],
     posts: [],
     uiState: {
-      viewedPosts: [],
-      modal: '',
+      viewedPostsId: new Set(),
+      modalId: '',
     },
   };
 
@@ -46,56 +46,55 @@ export default () => {
     resources: {
       ru,
     },
-  });
+  }).then(() => {
+    const watchedState = onChange(state, render(state, elements, i18n));
 
-  const watchedState = onChange(state, render(state, elements, i18n));
+    elements.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const value = formData.get('url');
+      const urls = watchedState.addedFeeds.map((feed) => feed.link);
+      validateUrl(value, urls, i18n)
+        .then((url) => {
+          watchedState.form.errors = '';
+          watchedState.form.processState = 'adding';
 
-  elements.form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const value = formData.get('url');
-    const urls = watchedState.addedFeeds.map((feed) => feed.link);
-    validateUrl(value, urls, i18n)
-      .then((url) => {
-        // watchedState.form.url = url;
-        watchedState.form.errors = '';
-        watchedState.form.processState = 'adding';
-
-        return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`);
-      })
-      .then((response) => {
-        const { feed, posts } = parse(response.data.contents);
-        feed.id = uniqueId();
-        feed.link = value;
-        posts.forEach((post) => {
-          post.feedId = feed.id;
-          post.id = uniqueId();
+          return axios.get(makeProxyUrl(url));
+        })
+        .then((response) => {
+          const { feed, posts } = parse(response.data.contents);
+          feed.id = uniqueId();
+          feed.link = value;
+          posts.forEach((post) => {
+            post.feedId = feed.id;
+            post.id = uniqueId();
+          });
+          watchedState.addedFeeds = [feed, ...watchedState.addedFeeds];
+          watchedState.posts = [...posts, ...watchedState.posts];
+          watchedState.form.processState = 'added';
+        })
+        .catch((err) => {
+          console.log(err);
+          watchedState.form.processState = 'error';
+          if (err.name === 'ValidationError') {
+            watchedState.form.errors = err.message;
+          }
+          if (err.response) {
+            watchedState.form.errors = 'errors.networkError';
+          }
+          if (err.message === 'parsingError') {
+            watchedState.form.errors = 'errors.parsingError';
+          }
         });
-        watchedState.addedFeeds = [feed, ...watchedState.addedFeeds];
-        watchedState.posts = [...posts, ...watchedState.posts];
-        watchedState.form.processState = 'added';
-      })
-      .catch((err) => {
-        console.log(err);
-        watchedState.form.processState = 'error';
-        if (err.name === 'ValidationError') {
-          watchedState.form.errors = err.message;
-        }
-        if (err.response) {
-          watchedState.form.errors = i18n.t('errors.networkError');
-        }
-        if (err.message === 'parsingError') {
-          watchedState.form.errors = i18n.t('errors.parsingError');
-        }
-      });
-  });
+    });
 
-  elements.postsContainer.addEventListener('click', (e) => {
-    watchedState.uiState.viewedPosts.push(e.target.dataset.id);
-    if (e.target.type === 'button') {
-      watchedState.uiState.modal = e.target.dataset.id;
-    }
-  });
+    elements.postsContainer.addEventListener('click', (e) => {
+      watchedState.uiState.viewedPostsId.add(e.target.dataset.id);
+      if (e.target.type === 'button') {
+        watchedState.uiState.modalId = e.target.dataset.id;
+      }
+    });
 
-  setTimeout(() => updatePosts(watchedState), 5000);
+    setTimeout(() => updatePosts(watchedState), 5000);
+  });
 };
