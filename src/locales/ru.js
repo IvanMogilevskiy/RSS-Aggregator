@@ -2,6 +2,7 @@ export default {
   translation: {
     processState: {
       added: 'RSS успешно загружен',
+      loading: 'Загрузка...',
     },
     errors: {
       notUrl: 'Ссылка должна быть валидным URL',
