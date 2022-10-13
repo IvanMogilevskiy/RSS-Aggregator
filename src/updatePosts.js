@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
+import { uniqueId } from 'lodash';
 import parse from './parser.js';
 import makeProxyUrl from './makeProxyUrl.js';
 
@@ -12,6 +13,7 @@ const updatePosts = (watchedState) => {
         const newPosts = posts.filter(({ link }) => !usedPostLinks.includes(link));
         if (newPosts.length !== 0) {
           newPosts.forEach((post) => {
+            post.id = uniqueId();
             post.feedId = addedFeed.id;
           });
           watchedState.posts = [...newPosts, ...watchedState.posts];
