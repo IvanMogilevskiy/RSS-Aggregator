@@ -74,15 +74,12 @@ export default () => {
           watchedState.form.processState = 'added';
         })
         .catch((err) => {
-          console.log(err);
           watchedState.form.processState = 'error';
           if (err.name === 'ValidationError') {
             watchedState.form.errors = err.message;
-          }
-          if (err.response) {
+          } else if (err.response) {
             watchedState.form.errors = 'errors.networkError';
-          }
-          if (err.message === 'parsingError') {
+          } else if (err.message === 'parsingError') {
             watchedState.form.errors = 'errors.parsingError';
           }
         });
