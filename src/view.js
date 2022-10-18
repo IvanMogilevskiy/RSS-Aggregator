@@ -5,7 +5,8 @@ const handleProcessState = (elements, processState, i18n) => {
     case 'added':
       elements.submitButton.disabled = false;
       elements.input.readOnly = false;
-      elements.feedback.classList.replace('text-danger', 'text-success');
+      elements.feedback.classList.remove('text-light', 'text-danger');
+      elements.feedback.classList.add('text-success');
       elements.feedback.textContent = i18n.t('processState.added');
       elements.form.reset();
       elements.form.focus();
@@ -19,6 +20,8 @@ const handleProcessState = (elements, processState, i18n) => {
     case 'adding':
       elements.submitButton.disabled = true;
       elements.input.readOnly = true;
+      elements.feedback.classList.remove('text-danger', 'text-success');
+      elements.feedback.classList.add('text-light');
       elements.feedback.textContent = i18n.t('processState.loading');
       break;
 
@@ -42,7 +45,7 @@ const renderErrors = (elements, error, prevError, i18n) => {
 
   if (hadError && !hasError) {
     elements.input.classList.remove('is-invalid');
-    elements.feedback.classList.replace('text-danger', 'text-success');
+    elements.feedback.classList.replace('text-light', 'text-success');
     elements.feedback.textContent = '';
     return;
   }
@@ -53,6 +56,7 @@ const renderErrors = (elements, error, prevError, i18n) => {
   }
 
   elements.input.classList.add('is-invalid');
+  elements.feedback.classList.remove('text-light', 'text-success');
   elements.feedback.classList.add('text-danger');
   elements.feedback.textContent = i18n.t(error);
 };
@@ -181,7 +185,7 @@ const render = (watchedState, elements, i18n) => (path, value, prevValue) => {
       break;
 
     default:
-      break;
+      throw new Error(`Path ${path} is unknown`);
   }
 };
 

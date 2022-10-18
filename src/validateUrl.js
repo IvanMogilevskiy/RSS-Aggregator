@@ -1,13 +1,13 @@
 import * as yup from 'yup';
 
-const validateUrl = (url, urls, i18n) => {
+const validateUrl = (url, urls) => {
   yup.setLocale({
     string: {
-      url: i18n.t('errors.notUrl'),
+      url: ('errors.notUrl'),
     },
     mixed: {
-      notOneOf: i18n.t('errors.notUnique'),
-      required: i18n.t('errors.required'),
+      notOneOf: ('errors.notUnique'),
+      required: ('errors.required'),
     },
   });
 

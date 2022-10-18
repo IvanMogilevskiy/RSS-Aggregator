@@ -52,10 +52,10 @@ export default () => {
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const value = formData.get('url');
+      const url = formData.get('url');
       const urls = watchedState.addedFeeds.map((feed) => feed.link);
-      validateUrl(value, urls, i18n)
-        .then((url) => {
+      validateUrl(url, urls)
+        .then(() => {
           watchedState.form.errors = '';
           watchedState.form.processState = 'adding';
 
@@ -64,7 +64,7 @@ export default () => {
         .then((response) => {
           const { feed, posts } = parse(response.data.contents);
           feed.id = uniqueId();
-          feed.link = value;
+          feed.link = url;
           posts.forEach((post) => {
             post.feedId = feed.id;
             post.id = uniqueId();
@@ -82,6 +82,7 @@ export default () => {
           } else if (err.message === 'parsingError') {
             watchedState.form.errors = 'errors.parsingError';
           }
+          watchedState.form.processState = 'filling';
         });
     });
 
